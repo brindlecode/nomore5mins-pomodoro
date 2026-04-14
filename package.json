@@ -1,0 +1,34 @@
+{
+  "name": "nomore5mins-pomodoro",
+  "version": "1.0.0",
+  "description": "NoMore5Mins Pomodoro Timer Video Generator — Remotion Edition",
+  "scripts": {
+    "start": "npx remotion studio",
+    "build": "npx remotion render",
+    "render": "npx tsx scripts/render.ts",
+    "render:thumb": "npx tsx scripts/render-thumbnail.ts",
+    "metadata": "npx tsx scripts/generate-metadata.ts",
+    "test:sprint": "npx remotion render PomodoroVideo out/test_sprint.mp4 --props='{\"config\":\"25-5\",\"mode\":\"sprint\",\"sprint\":2,\"audioMode\":\"silent\",\"theme\":\"default\"}'",
+    "test:cycle": "npx remotion render PomodoroVideo out/test_cycle.mp4 --props='{\"config\":\"25-5\",\"mode\":\"cycle\",\"cycles\":1,\"longBreak\":15,\"audioMode\":\"silent\",\"theme\":\"default\"}'",
+    "test:thumb": "npx remotion still Thumbnail out/test_thumb.png --props='{\"config\":\"25-5\",\"mode\":\"sprint\",\"sprint\":2,\"audioMode\":\"silent\",\"theme\":\"piano\"}'",
+    "catalog": "npx tsx scripts/generate-metadata.ts --list",
+    "batch:plan": "npx tsx scripts/render.ts --batch-plan",
+    "upgrade": "npx remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.242",
+    "@remotion/player": "4.0.242",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "4.0.242"
+  },
+  "devDependencies": {
+    "@remotion/bundler": "4.0.242",
+    "@remotion/renderer": "4.0.242",
+    "@types/react": "^18.3.12",
+    "@types/node": "^20.17.0",
+    "prettier": "^3.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

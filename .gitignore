@@ -1,0 +1,8 @@
+node_modules/
+dist/
+out/
+pomodoro_output/
+*.mp4
+*.wav
+public/sounds/
+!public/sounds/.gitkeep
