@@ -66,6 +66,8 @@ async function main() {
       console.log(`  SKIP [#${currentIndex}] ${spec.filename} (${spec.totalMin} min)`);
       skipped++;
       currentIndex++;
+      // Update next_index even for skipped videos
+      fs.writeFileSync("next_index.txt", String(currentIndex), "utf-8");
       continue;
     }
 
@@ -145,7 +147,9 @@ async function main() {
       );
     } catch {}
 
+    // Update next_index after each video — survives timeout
     currentIndex++;
+    fs.writeFileSync("next_index.txt", String(currentIndex), "utf-8");
   }
 
   const totalTime = ((Date.now() - chainStart) / 1000 / 60).toFixed(1);
