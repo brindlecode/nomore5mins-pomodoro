@@ -1,0 +1,72 @@
+name: Render Pomodoro Videos
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_index:
+        description: 'Start from video index (0 = first)'
+        required: true
+        default: '0'
+      skip_long:
+        description: 'Skip videos longer than N minutes'
+        required: true
+        default: '180'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
+      - run: npm ci
+      - run: npx tsx scripts/generate-tones.ts
+
+      - name: Render videos
+        run: |
+          npx tsx scripts/render-chain.ts \
+            --start ${{ github.event.inputs.start_index }} \
+            --skip-long ${{ github.event.inputs.skip_long }} \
+            --max-hours 5
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-from-${{ github.event.inputs.start_index }}
+          path: pomodoro_output/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Trigger next run
+        if: always()
+        run: |
+          if [ ! -f next_index.txt ]; then
+            echo "No next_index.txt — stopping."
+            exit 0
+          fi
+
+          NEXT=$(cat next_index.txt)
+
+          if [ "$NEXT" = "DONE" ]; then
+            echo "All videos complete!"
+            exit 0
+          fi
+
+          echo "Triggering next run from index $NEXT..."
+          curl -s -X POST \
+            -H "Authorization: token ${{ secrets.RENDER_PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/render.yml/dispatches \
+            -d "{\"ref\":\"main\",\"inputs\":{\"start_index\":\"$NEXT\",\"skip_long\":\"${{ github.event.inputs.skip_long }}\"}}"
+          echo "Next batch triggered from index $NEXT"
